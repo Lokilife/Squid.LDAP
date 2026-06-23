@@ -25,7 +25,10 @@ RUN wget -O /tmp/squid-${SQUID_VERSION}.tar.gz \
     make && \
     cd ../src/auth/basic/LDAP && \
     make && \
-    cp basic_ldap_auth /tmp/
+    cp basic_ldap_auth /tmp/ && \
+    cd ../../../acl/external/LDAP_group && \
+    make && \
+    cp ext_ldap_group_acl /tmp/
 
 FROM alpine:3.20 AS final
 
@@ -35,6 +38,7 @@ RUN apk add --no-cache \
     openldap-clients
 
 COPY --from=builder /tmp/basic_ldap_auth /usr/lib/squid/
+COPY --from=builder /tmp/ext_ldap_group_acl /usr/lib/squid/
 
 RUN mkdir -p /var/cache/squid /var/log/squid && \
     chown squid:squid /var/cache/squid /var/log/squid
